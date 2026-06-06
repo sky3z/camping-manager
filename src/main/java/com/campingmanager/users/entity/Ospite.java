@@ -33,4 +33,13 @@ public class Ospite extends User {
     public Role getRole() {
         return Role.OSPITE;
     }
+
+    /**
+     * L'account ospite e attivo solo entro la fine del soggiorno:
+     * dopo {@code accountValidUntil} il login viene rifiutato.
+     */
+    @Override
+    public boolean isEnabled() {
+        return accountValidUntil == null || !LocalDate.now().isAfter(accountValidUntil);
+    }
 }
