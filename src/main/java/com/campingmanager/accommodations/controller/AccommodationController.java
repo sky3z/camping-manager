@@ -6,6 +6,7 @@ import com.campingmanager.accommodations.entity.AccommodationStatus;
 import com.campingmanager.accommodations.service.AccommodationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -33,6 +35,15 @@ public class AccommodationController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) AccommodationStatus status) {
         return ResponseEntity.ok(service.getAll(type, status));
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<AccommodationDTO>> getAvailable(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
+            @RequestParam(defaultValue = "1") int capacity,
+            @RequestParam(required = false) String type) {
+        return ResponseEntity.ok(service.findAvailable(checkIn, checkOut, capacity, type));
     }
 
     @GetMapping("/{id}")

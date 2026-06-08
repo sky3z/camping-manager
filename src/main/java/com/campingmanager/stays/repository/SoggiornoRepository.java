@@ -15,6 +15,10 @@ public interface SoggiornoRepository extends JpaRepository<Soggiorno, Long> {
 
     List<Soggiorno> findByAccommodationId(Long accommodationId);
 
+    List<Soggiorno> findByCheckInDate(LocalDate date);
+
+    List<Soggiorno> findByCheckOutDate(LocalDate date);
+
     /**
      * True se esiste gia un soggiorno (non cancellato) che si sovrappone alle date indicate
      * per lo stesso alloggio. Due intervalli si sovrappongono se inizio1 &lt; fine2 e fine1 &gt; inizio2.

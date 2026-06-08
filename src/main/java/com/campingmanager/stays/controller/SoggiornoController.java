@@ -4,11 +4,13 @@ import com.campingmanager.stays.dto.CheckInRequest;
 import com.campingmanager.stays.dto.CheckInResponse;
 import com.campingmanager.stays.dto.CreateSoggiornoRequest;
 import com.campingmanager.stays.dto.SoggiornoDTO;
+import com.campingmanager.stays.dto.TodayOverviewDTO;
 import com.campingmanager.stays.entity.SoggiornoStatus;
 import com.campingmanager.stays.service.SoggiornoService;
 import com.campingmanager.users.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -42,6 +45,13 @@ public class SoggiornoController {
             @RequestParam(required = false) SoggiornoStatus status,
             @RequestParam(required = false) Long accommodationId) {
         return ResponseEntity.ok(service.getAll(status, accommodationId));
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<TodayOverviewDTO> getToday(
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(service.getToday(date));
     }
 
     @GetMapping("/{id}")

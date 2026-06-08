@@ -10,6 +10,7 @@ import com.campingmanager.stays.dto.CheckInRequest;
 import com.campingmanager.stays.dto.CheckInResponse;
 import com.campingmanager.stays.dto.CreateSoggiornoRequest;
 import com.campingmanager.stays.dto.SoggiornoDTO;
+import com.campingmanager.stays.dto.TodayOverviewDTO;
 import com.campingmanager.stays.entity.Soggiorno;
 import com.campingmanager.stays.entity.SoggiornoStatus;
 import com.campingmanager.stays.repository.SoggiornoRepository;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -168,6 +170,18 @@ public class SoggiornoService {
         accommodationRepository.save(accommodation);
 
         return SoggiornoDTO.from(soggiornoRepository.save(soggiorno));
+    }
+
+    /**
+     * Arrivi (check-in previsti) e partenze (check-out previsti) di una data (default: oggi).
+     */
+    public TodayOverviewDTO getToday(LocalDate date) {
+        LocalDate day = (date == null) ? LocalDate.now() : date;
+        List<SoggiornoDTO> arrivals = soggiornoRepository.findByCheckInDate(day).stream()
+                .map(SoggiornoDTO::from).toList();
+        List<SoggiornoDTO> departures = soggiornoRepository.findByCheckOutDate(day).stream()
+                .map(SoggiornoDTO::from).toList();
+        return new TodayOverviewDTO(day, arrivals, departures);
     }
 
     private String generatePassword() {
