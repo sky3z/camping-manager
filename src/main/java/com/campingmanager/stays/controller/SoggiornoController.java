@@ -1,5 +1,7 @@
 package com.campingmanager.stays.controller;
 
+import com.campingmanager.stays.dto.CheckInRequest;
+import com.campingmanager.stays.dto.CheckInResponse;
 import com.campingmanager.stays.dto.CreateSoggiornoRequest;
 import com.campingmanager.stays.dto.SoggiornoDTO;
 import com.campingmanager.stays.entity.SoggiornoStatus;
@@ -13,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -61,5 +64,16 @@ public class SoggiornoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<SoggiornoDTO> cancel(@PathVariable Long id) {
         return ResponseEntity.ok(service.cancel(id));
+    }
+
+    @PatchMapping("/{id}/checkin")
+    public ResponseEntity<CheckInResponse> checkIn(@PathVariable Long id,
+                                                   @Valid @RequestBody CheckInRequest req) {
+        return ResponseEntity.ok(service.checkIn(id, req));
+    }
+
+    @PatchMapping("/{id}/checkout")
+    public ResponseEntity<SoggiornoDTO> checkOut(@PathVariable Long id) {
+        return ResponseEntity.ok(service.checkOut(id));
     }
 }

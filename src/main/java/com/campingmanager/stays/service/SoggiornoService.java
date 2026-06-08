@@ -1,23 +1,30 @@
 package com.campingmanager.stays.service;
 
 import com.campingmanager.accommodations.entity.Accommodation;
+import com.campingmanager.accommodations.entity.AccommodationStatus;
 import com.campingmanager.accommodations.repository.AccommodationRepository;
 import com.campingmanager.exceptions.BadRequestException;
 import com.campingmanager.exceptions.ConflictException;
 import com.campingmanager.exceptions.ResourceNotFoundException;
+import com.campingmanager.stays.dto.CheckInRequest;
+import com.campingmanager.stays.dto.CheckInResponse;
 import com.campingmanager.stays.dto.CreateSoggiornoRequest;
 import com.campingmanager.stays.dto.SoggiornoDTO;
 import com.campingmanager.stays.entity.Soggiorno;
 import com.campingmanager.stays.entity.SoggiornoStatus;
 import com.campingmanager.stays.repository.SoggiornoRepository;
+import com.campingmanager.users.entity.Ospite;
 import com.campingmanager.users.entity.Staff;
 import com.campingmanager.users.entity.User;
+import com.campingmanager.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +32,8 @@ public class SoggiornoService {
 
     private final SoggiornoRepository soggiornoRepository;
     private final AccommodationRepository accommodationRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public SoggiornoDTO create(CreateSoggiornoRequest req, User currentUser) {
         Accommodation accommodation = accommodationRepository.findById(req.getAccommodationId())
@@ -103,6 +112,66 @@ public class SoggiornoService {
         Soggiorno soggiorno = findEntity(id);
         soggiorno.setStatus(SoggiornoStatus.CANCELLATO);
         return SoggiornoDTO.from(soggiornoRepository.save(soggiorno));
+    }
+
+    /**
+     * Check-in: crea l'account ospite (valido fino al check-out), segna il soggiorno
+     * come CHECKED_IN e l'alloggio come OCCUPATA. Restituisce la password temporanea.
+     */
+    public CheckInResponse checkIn(Long id, CheckInRequest req) {
+        Soggiorno soggiorno = findEntity(id);
+        if (soggiorno.getStatus() != SoggiornoStatus.PRENOTATO) {
+            throw new BadRequestException("Il check-in e possibile solo per soggiorni in stato PRENOTATO");
+        }
+        if (userRepository.existsByEmail(soggiorno.getGuestEmail())) {
+            throw new ConflictException("Esiste gia un account con email: " + soggiorno.getGuestEmail());
+        }
+
+        String temporaryPassword = generatePassword();
+
+        Ospite ospite = new Ospite();
+        ospite.setEmail(soggiorno.getGuestEmail());
+        ospite.setPassword(passwordEncoder.encode(temporaryPassword));
+        String[] parts = soggiorno.getGuestName().trim().split("\\s+", 2);
+        ospite.setName(parts[0]);
+        ospite.setSurname(parts.length > 1 ? parts[1] : "-");
+        ospite.setDocumentNumber(req.getDocumentNumber());
+        ospite.setNationality(req.getNationality());
+        ospite.setPhone(req.getPhone());
+        ospite.setBirthDate(req.getBirthDate());
+        ospite.setAccountValidUntil(soggiorno.getCheckOutDate());
+        Ospite savedOspite = (Ospite) userRepository.save(ospite);
+
+        soggiorno.setOspiteAccount(savedOspite);
+        soggiorno.setStatus(SoggiornoStatus.CHECKED_IN);
+
+        Accommodation accommodation = soggiorno.getAccommodation();
+        accommodation.setStatus(AccommodationStatus.OCCUPATA);
+        accommodationRepository.save(accommodation);
+
+        Soggiorno saved = soggiornoRepository.save(soggiorno);
+        return new CheckInResponse(SoggiornoDTO.from(saved), savedOspite.getEmail(), temporaryPassword);
+    }
+
+    /**
+     * Check-out: chiude il soggiorno e libera l'alloggio.
+     */
+    public SoggiornoDTO checkOut(Long id) {
+        Soggiorno soggiorno = findEntity(id);
+        if (soggiorno.getStatus() != SoggiornoStatus.CHECKED_IN) {
+            throw new BadRequestException("Il check-out e possibile solo per soggiorni in stato CHECKED_IN");
+        }
+        soggiorno.setStatus(SoggiornoStatus.CHECKED_OUT);
+
+        Accommodation accommodation = soggiorno.getAccommodation();
+        accommodation.setStatus(AccommodationStatus.DISPONIBILE);
+        accommodationRepository.save(accommodation);
+
+        return SoggiornoDTO.from(soggiornoRepository.save(soggiorno));
+    }
+
+    private String generatePassword() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 10);
     }
 
     private Soggiorno findEntity(Long id) {
