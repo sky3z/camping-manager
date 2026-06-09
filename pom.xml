@@ -87,6 +87,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Stripe (pagamenti noleggio bici) -->
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>33.0.0</version>
+		</dependency>
+
 		<!-- H2 in-memory database per i test -->
 		<dependency>
 			<groupId>com.h2database</groupId>
