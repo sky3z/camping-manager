@@ -1,0 +1,426 @@
+{
+  "info": {
+    "name": "Camping Manager API",
+    "description": "Collection completa del backend Camping Manager (EPICODE - Backend Programming). Esegui prima 'Auth > Login': il token viene salvato in {{token}} e usato dalle richieste protette.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  console.log('Token salvato');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@camping.it\",\n  \"password\": \"Admin123!\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profilo",
+      "item": [
+        {
+          "name": "Profilo corrente",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api","users","me"] }
+          }
+        },
+        {
+          "name": "Aggiorna immagine profilo",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/users/me/avatar", "host": ["{{baseUrl}}"], "path": ["api","users","me","avatar"] },
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": [] } ] }
+          }
+        },
+        {
+          "name": "Cambia password",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/users/me/password", "host": ["{{baseUrl}}"], "path": ["api","users","me","password"] },
+            "body": { "mode": "raw", "raw": "{\n  \"oldPassword\": \"Admin123!\",\n  \"newPassword\": \"NuovaPassword123!\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Utenti",
+      "item": [
+        {
+          "name": "Lista utenti",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/users?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api","admin","users"], "query": [ { "key": "page", "value": "0" }, { "key": "size", "value": "20" }, { "key": "role", "value": "STAFF", "disabled": true } ] }
+          }
+        },
+        {
+          "name": "Dettaglio utente",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/users/1", "host": ["{{baseUrl}}"], "path": ["api","admin","users","1"] }
+          }
+        },
+        {
+          "name": "Crea staff",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/staff", "host": ["{{baseUrl}}"], "path": ["api","admin","staff"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"reception@camping.it\",\n  \"password\": \"Password123!\",\n  \"name\": \"Luca\",\n  \"surname\": \"Verdi\",\n  \"department\": \"RECEPTION\"\n}" }
+          }
+        },
+        {
+          "name": "Elimina utente",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/users/2", "host": ["{{baseUrl}}"], "path": ["api","admin","users","2"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alloggi",
+      "item": [
+        {
+          "name": "Lista alloggi",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/accommodations?type=CHALET", "host": ["{{baseUrl}}"], "path": ["api","accommodations"], "query": [ { "key": "type", "value": "CHALET" }, { "key": "status", "value": "DISPONIBILE", "disabled": true } ] }
+          }
+        },
+        {
+          "name": "Alloggi disponibili",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/accommodations/available?checkIn=2026-07-01&checkOut=2026-07-05&capacity=2&type=CHALET", "host": ["{{baseUrl}}"], "path": ["api","accommodations","available"], "query": [ { "key": "checkIn", "value": "2026-07-01" }, { "key": "checkOut", "value": "2026-07-05" }, { "key": "capacity", "value": "2" }, { "key": "type", "value": "CHALET" } ] }
+          }
+        },
+        {
+          "name": "Dettaglio alloggio",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/accommodations/1", "host": ["{{baseUrl}}"], "path": ["api","accommodations","1"] }
+          }
+        },
+        {
+          "name": "Crea alloggio (Chalet)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/accommodations", "host": ["{{baseUrl}}"], "path": ["api","accommodations"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Chalet 11\",\n  \"description\": \"Chalet in legno\",\n  \"maxCapacity\": 4,\n  \"pricePerNight\": 90.00,\n  \"type\": \"CHALET\",\n  \"rooms\": 2,\n  \"beds\": 4,\n  \"hasBathroom\": true,\n  \"hasKitchen\": true,\n  \"hasAc\": true\n}" }
+          }
+        },
+        {
+          "name": "Aggiorna alloggio",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/accommodations/1", "host": ["{{baseUrl}}"], "path": ["api","accommodations","1"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Chalet 1\",\n  \"description\": \"Chalet ristrutturato\",\n  \"maxCapacity\": 5,\n  \"pricePerNight\": 95.00,\n  \"type\": \"CHALET\",\n  \"rooms\": 3,\n  \"beds\": 5,\n  \"hasBathroom\": true,\n  \"hasKitchen\": true,\n  \"hasAc\": true\n}" }
+          }
+        },
+        {
+          "name": "Elimina alloggio",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/accommodations/21", "host": ["{{baseUrl}}"], "path": ["api","accommodations","21"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Soggiorni (PMS)",
+      "item": [
+        {
+          "name": "Lista soggiorni",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/stays", "host": ["{{baseUrl}}"], "path": ["api","stays"], "query": [ { "key": "status", "value": "PRENOTATO", "disabled": true }, { "key": "accommodationId", "value": "1", "disabled": true } ] }
+          }
+        },
+        {
+          "name": "Arrivi/partenze di oggi",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/stays/today", "host": ["{{baseUrl}}"], "path": ["api","stays","today"] }
+          }
+        },
+        {
+          "name": "Dettaglio soggiorno",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/stays/1", "host": ["{{baseUrl}}"], "path": ["api","stays","1"] }
+          }
+        },
+        {
+          "name": "Crea soggiorno",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/stays", "host": ["{{baseUrl}}"], "path": ["api","stays"] },
+            "body": { "mode": "raw", "raw": "{\n  \"accommodationId\": 1,\n  \"guestName\": \"Mario Rossi\",\n  \"guestEmail\": \"mario.rossi@example.com\",\n  \"numGuests\": 2,\n  \"checkInDate\": \"2026-07-01\",\n  \"checkOutDate\": \"2026-07-05\"\n}" }
+          }
+        },
+        {
+          "name": "Modifica soggiorno",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/stays/1", "host": ["{{baseUrl}}"], "path": ["api","stays","1"] },
+            "body": { "mode": "raw", "raw": "{\n  \"accommodationId\": 1,\n  \"guestName\": \"Mario Rossi\",\n  \"guestEmail\": \"mario.rossi@example.com\",\n  \"numGuests\": 3,\n  \"checkInDate\": \"2026-07-01\",\n  \"checkOutDate\": \"2026-07-06\"\n}" }
+          }
+        },
+        {
+          "name": "Check-in",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/stays/1/checkin", "host": ["{{baseUrl}}"], "path": ["api","stays","1","checkin"] },
+            "body": { "mode": "raw", "raw": "{\n  \"documentNumber\": \"AB1234567\",\n  \"nationality\": \"IT\",\n  \"phone\": \"+39 333 1112233\",\n  \"birthDate\": \"1990-05-12\"\n}" }
+          }
+        },
+        {
+          "name": "Check-out",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/stays/1/checkout", "host": ["{{baseUrl}}"], "path": ["api","stays","1","checkout"] }
+          }
+        },
+        {
+          "name": "Cancella soggiorno",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/stays/1", "host": ["{{baseUrl}}"], "path": ["api","stays","1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ristorante",
+      "item": [
+        {
+          "name": "Lista tavoli",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/restaurant/tables", "host": ["{{baseUrl}}"], "path": ["api","restaurant","tables"] }
+          }
+        },
+        {
+          "name": "Crea tavolo",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/restaurant/tables", "host": ["{{baseUrl}}"], "path": ["api","restaurant","tables"] },
+            "body": { "mode": "raw", "raw": "{\n  \"number\": 1,\n  \"seats\": 4,\n  \"location\": \"ESTERNO\"\n}" }
+          }
+        },
+        {
+          "name": "Lista prenotazioni",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/restaurant/bookings", "host": ["{{baseUrl}}"], "path": ["api","restaurant","bookings"] }
+          }
+        },
+        {
+          "name": "Prenota tavolo (OSPITE)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/restaurant/bookings", "host": ["{{baseUrl}}"], "path": ["api","restaurant","bookings"] },
+            "body": { "mode": "raw", "raw": "{\n  \"tableId\": 1,\n  \"bookingDate\": \"2026-07-02\",\n  \"bookingTime\": \"20:30\",\n  \"numPeople\": 2\n}" }
+          }
+        },
+        {
+          "name": "Cancella prenotazione",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/restaurant/bookings/1/cancel", "host": ["{{baseUrl}}"], "path": ["api","restaurant","bookings","1","cancel"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bici",
+      "item": [
+        {
+          "name": "Lista bici",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/bikes?type=CITY", "host": ["{{baseUrl}}"], "path": ["api","bikes"], "query": [ { "key": "type", "value": "CITY" }, { "key": "status", "value": "DISPONIBILE", "disabled": true } ] }
+          }
+        },
+        {
+          "name": "Crea bici",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/bikes", "host": ["{{baseUrl}}"], "path": ["api","bikes"] },
+            "body": { "mode": "raw", "raw": "{\n  \"code\": \"BIKE-01\",\n  \"model\": \"City Comfort\",\n  \"type\": \"CITY\",\n  \"pricePerDay\": 15.00\n}" }
+          }
+        },
+        {
+          "name": "Bici disponibili",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/bikes/available?start=2026-07-01&end=2026-07-03", "host": ["{{baseUrl}}"], "path": ["api","bikes","available"], "query": [ { "key": "start", "value": "2026-07-01" }, { "key": "end", "value": "2026-07-03" } ] }
+          }
+        },
+        {
+          "name": "Crea noleggio (OSPITE)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/bikes/rentals", "host": ["{{baseUrl}}"], "path": ["api","bikes","rentals"] },
+            "body": { "mode": "raw", "raw": "{\n  \"bikeId\": 1,\n  \"startDate\": \"2026-07-01\",\n  \"endDate\": \"2026-07-03\"\n}" }
+          }
+        },
+        {
+          "name": "Lista noleggi",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/bikes/rentals", "host": ["{{baseUrl}}"], "path": ["api","bikes","rentals"] }
+          }
+        },
+        {
+          "name": "Restituzione noleggio",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/bikes/rentals/1/return", "host": ["{{baseUrl}}"], "path": ["api","bikes","rentals","1","return"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pagamenti (Stripe)",
+      "item": [
+        {
+          "name": "Checkout noleggio (OSPITE)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/payments/rentals/1/checkout", "host": ["{{baseUrl}}"], "path": ["api","payments","rentals","1","checkout"] }
+          }
+        },
+        {
+          "name": "Conferma pagamento (success)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/payments/success?session_id=cs_test_xxx", "host": ["{{baseUrl}}"], "path": ["api","payments","success"], "query": [ { "key": "session_id", "value": "cs_test_xxx" } ] }
+          }
+        },
+        {
+          "name": "Stato pagamento",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/payments/1", "host": ["{{baseUrl}}"], "path": ["api","payments","1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Meteo",
+      "item": [
+        {
+          "name": "Meteo corrente",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/weather", "host": ["{{baseUrl}}"], "path": ["api","weather"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Statistiche (ADMIN)",
+      "item": [
+        {
+          "name": "Occupazione",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/stats/occupancy?from=2026-07-01&to=2026-07-31", "host": ["{{baseUrl}}"], "path": ["api","admin","stats","occupancy"], "query": [ { "key": "from", "value": "2026-07-01" }, { "key": "to", "value": "2026-07-31" } ] }
+          }
+        },
+        {
+          "name": "Fatturato noleggi",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/stats/rental-revenue", "host": ["{{baseUrl}}"], "path": ["api","admin","stats","rental-revenue"] }
+          }
+        },
+        {
+          "name": "Bici piu noleggiate",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/stats/popular-bikes", "host": ["{{baseUrl}}"], "path": ["api","admin","stats","popular-bikes"] }
+          }
+        },
+        {
+          "name": "Serate ristorante affollate",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/stats/busy-nights", "host": ["{{baseUrl}}"], "path": ["api","admin","stats","busy-nights"] }
+          }
+        },
+        {
+          "name": "Ospiti in struttura",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/admin/stats/in-house", "host": ["{{baseUrl}}"], "path": ["api","admin","stats","in-house"] }
+          }
+        }
+      ]
+    }
+  ]
+}

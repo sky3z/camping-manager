@@ -1,0 +1,38 @@
+# Esempio di configurazione. Copia i valori in variabili d'ambiente o in un
+# application-local.properties (NON committare segreti reali).
+
+# === Database (PostgreSQL) ===
+DB_NAME=camping_manager
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+
+# === JWT ===
+# Usa una chiave lunga almeno 32 caratteri
+JWT_SECRET=cambia-questa-chiave-segreta-con-almeno-32-caratteri
+JWT_EXPIRATION_MS=86400000
+
+# === Upload immagini profilo ===
+UPLOAD_DIR=uploads
+
+# === Admin iniziale (seed) ===
+ADMIN_EMAIL=admin@camping.it
+ADMIN_PASSWORD=Admin123!
+
+# === URL base (redirect Stripe) ===
+APP_BASE_URL=http://localhost:8080
+
+# === Stripe (pagamento noleggio bici) ===
+STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+# === Meteo (OpenWeatherMap) ===
+WEATHER_API_KEY=la-tua-api-key
+WEATHER_CITY=Trento,IT
+
+# === Email (Brevo/SendGrid) ===
+EMAIL_API_KEY=la-tua-api-key
+EMAIL_FROM=noreply@campingmanager.it
+EMAIL_FROM_NAME=Camping Manager
+
+# === Server ===
+SERVER_PORT=8080
