@@ -24,4 +24,17 @@ public interface BikeRentalRepository extends JpaRepository<BikeRental, Long> {
                           @Param("start") LocalDate start,
                           @Param("end") LocalDate end,
                           @Param("excludedStatus") BikeRentalStatus excludedStatus);
+
+    /**
+     * Conteggio dei noleggi (non cancellati) per tipo di bici, dal piu noleggiato.
+     * Ritorna righe [tipo (BikeType), conteggio (Long)].
+     */
+    @Query("""
+            SELECT r.bike.type, COUNT(r)
+            FROM BikeRental r
+            WHERE r.status <> com.campingmanager.bikes.entity.BikeRentalStatus.CANCELLATO
+            GROUP BY r.bike.type
+            ORDER BY COUNT(r) DESC
+            """)
+    List<Object[]> countByBikeType();
 }

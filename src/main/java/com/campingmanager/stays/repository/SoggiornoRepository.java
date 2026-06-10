@@ -34,4 +34,16 @@ public interface SoggiornoRepository extends JpaRepository<Soggiorno, Long> {
                           @Param("checkIn") LocalDate checkIn,
                           @Param("checkOut") LocalDate checkOut,
                           @Param("excludedStatus") SoggiornoStatus excludedStatus);
+
+    /**
+     * Numero di alloggi distinti occupati (soggiorni non cancellati) in un intervallo.
+     */
+    @Query("""
+            SELECT COUNT(DISTINCT s.accommodation.id)
+            FROM Soggiorno s
+            WHERE s.status <> com.campingmanager.stays.entity.SoggiornoStatus.CANCELLATO
+              AND s.checkInDate < :to
+              AND s.checkOutDate > :from
+            """)
+    long countOccupied(@Param("from") LocalDate from, @Param("to") LocalDate to);
 }
