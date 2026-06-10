@@ -3,6 +3,7 @@ package com.campingmanager.stays;
 import com.campingmanager.accommodations.entity.AccommodationStatus;
 import com.campingmanager.accommodations.entity.Chalet;
 import com.campingmanager.accommodations.repository.AccommodationRepository;
+import com.campingmanager.email.EmailService;
 import com.campingmanager.exceptions.BadRequestException;
 import com.campingmanager.exceptions.ConflictException;
 import com.campingmanager.stays.dto.CheckInRequest;
@@ -44,6 +45,8 @@ class CheckInServiceTest {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private SoggiornoService service;

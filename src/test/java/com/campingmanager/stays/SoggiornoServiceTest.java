@@ -2,6 +2,7 @@ package com.campingmanager.stays;
 
 import com.campingmanager.accommodations.entity.Chalet;
 import com.campingmanager.accommodations.repository.AccommodationRepository;
+import com.campingmanager.email.EmailService;
 import com.campingmanager.exceptions.BadRequestException;
 import com.campingmanager.exceptions.ConflictException;
 import com.campingmanager.exceptions.ResourceNotFoundException;
@@ -35,6 +36,8 @@ class SoggiornoServiceTest {
     private SoggiornoRepository soggiornoRepository;
     @Mock
     private AccommodationRepository accommodationRepository;
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private SoggiornoService service;

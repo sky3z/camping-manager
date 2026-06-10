@@ -6,6 +6,7 @@ import com.campingmanager.bikes.entity.BikeRentalStatus;
 import com.campingmanager.bikes.entity.BikeStatus;
 import com.campingmanager.bikes.repository.BikeRentalRepository;
 import com.campingmanager.bikes.repository.BikeRepository;
+import com.campingmanager.email.EmailService;
 import com.campingmanager.exceptions.BadRequestException;
 import com.campingmanager.exceptions.ResourceNotFoundException;
 import com.campingmanager.payments.dto.CheckoutResponse;
@@ -30,6 +31,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BikeRentalRepository rentalRepository;
     private final BikeRepository bikeRepository;
+    private final EmailService emailService;
 
     @Value("${stripe.api.key:}")
     private String stripeApiKey;
@@ -111,6 +113,10 @@ public class PaymentService {
         Bike bike = rental.getBike();
         bike.setStatus(BikeStatus.NOLEGGIATA);
         bikeRepository.save(bike);
+
+        if (rental.getOspite() != null) {
+            emailService.sendRentalConfirmation(rental.getOspite().getEmail(), bike.getCode());
+        }
 
         return PaymentDTO.from(paymentRepository.save(payment));
     }

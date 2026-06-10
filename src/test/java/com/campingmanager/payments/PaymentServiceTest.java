@@ -6,6 +6,7 @@ import com.campingmanager.bikes.entity.BikeRentalStatus;
 import com.campingmanager.bikes.entity.BikeStatus;
 import com.campingmanager.bikes.repository.BikeRentalRepository;
 import com.campingmanager.bikes.repository.BikeRepository;
+import com.campingmanager.email.EmailService;
 import com.campingmanager.exceptions.ResourceNotFoundException;
 import com.campingmanager.payments.dto.PaymentDTO;
 import com.campingmanager.payments.entity.Payment;
@@ -34,6 +35,8 @@ class PaymentServiceTest {
     private BikeRentalRepository rentalRepository;
     @Mock
     private BikeRepository bikeRepository;
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private PaymentService service;

@@ -3,6 +3,7 @@ package com.campingmanager.stays.service;
 import com.campingmanager.accommodations.entity.Accommodation;
 import com.campingmanager.accommodations.entity.AccommodationStatus;
 import com.campingmanager.accommodations.repository.AccommodationRepository;
+import com.campingmanager.email.EmailService;
 import com.campingmanager.exceptions.BadRequestException;
 import com.campingmanager.exceptions.ConflictException;
 import com.campingmanager.exceptions.ResourceNotFoundException;
@@ -36,6 +37,7 @@ public class SoggiornoService {
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public SoggiornoDTO create(CreateSoggiornoRequest req, User currentUser) {
         Accommodation accommodation = accommodationRepository.findById(req.getAccommodationId())
@@ -152,6 +154,9 @@ public class SoggiornoService {
         accommodationRepository.save(accommodation);
 
         Soggiorno saved = soggiornoRepository.save(soggiorno);
+
+        emailService.sendGuestCredentials(savedOspite.getEmail(), savedOspite.getName(), temporaryPassword);
+
         return new CheckInResponse(SoggiornoDTO.from(saved), savedOspite.getEmail(), temporaryPassword);
     }
 

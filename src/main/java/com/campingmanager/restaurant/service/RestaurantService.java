@@ -1,5 +1,6 @@
 package com.campingmanager.restaurant.service;
 
+import com.campingmanager.email.EmailService;
 import com.campingmanager.exceptions.BadRequestException;
 import com.campingmanager.exceptions.ConflictException;
 import com.campingmanager.exceptions.ResourceNotFoundException;
@@ -26,6 +27,7 @@ public class RestaurantService {
 
     private final RestaurantTableRepository tableRepository;
     private final TableBookingRepository bookingRepository;
+    private final EmailService emailService;
 
     // === Tavoli ===
 
@@ -70,7 +72,10 @@ public class RestaurantService {
         booking.setNumPeople(req.getNumPeople());
         booking.setStatus(TableBookingStatus.CONFERMATA);
 
-        return TableBookingDTO.from(bookingRepository.save(booking));
+        TableBooking saved = bookingRepository.save(booking);
+        emailService.sendTableBookingConfirmation(
+                ospite.getEmail(), saved.getBookingDate(), saved.getBookingTime());
+        return TableBookingDTO.from(saved);
     }
 
     public List<TableBookingDTO> getBookings(User currentUser) {

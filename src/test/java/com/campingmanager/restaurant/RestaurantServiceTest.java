@@ -1,5 +1,6 @@
 package com.campingmanager.restaurant;
 
+import com.campingmanager.email.EmailService;
 import com.campingmanager.exceptions.BadRequestException;
 import com.campingmanager.exceptions.ConflictException;
 import com.campingmanager.exceptions.ResourceNotFoundException;
@@ -36,6 +37,8 @@ class RestaurantServiceTest {
     private RestaurantTableRepository tableRepository;
     @Mock
     private TableBookingRepository bookingRepository;
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private RestaurantService service;
